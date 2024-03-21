@@ -5,6 +5,15 @@ VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloWorldSsms20Extension", "HelloWorldSsms20Extension\HelloWorldSsms20Extension.csproj", "{0E9BD49E-AD47-4393-8585-F253EE190D31}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SSMSLibraries", "SSMSLibraries", "{E8A86C4D-359F-4150-BA60-504A034F7510}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SSMS20", "SSMS20", "{1D618647-B2B1-48A3-8348-2F5006921ACF}"
+	ProjectSection(SolutionItems) = preProject
+		SSMSLibraries\SSMS20\Microsoft.SqlServer.RegSvrEnum.dll = SSMSLibraries\SSMS20\Microsoft.SqlServer.RegSvrEnum.dll
+		SSMSLibraries\SSMS20\SqlPackageBase.dll = SSMSLibraries\SSMS20\SqlPackageBase.dll
+		SSMSLibraries\SSMS20\SqlWorkbench.Interfaces.dll = SSMSLibraries\SSMS20\SqlWorkbench.Interfaces.dll
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +39,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1D618647-B2B1-48A3-8348-2F5006921ACF} = {E8A86C4D-359F-4150-BA60-504A034F7510}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {190CD5DE-73EA-4E69-B625-C3E78109F5A0}

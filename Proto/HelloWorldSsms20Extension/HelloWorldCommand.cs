@@ -1,4 +1,5 @@
 ﻿using EnvDTE80;
+using Microsoft.SqlServer.Management.UI.VSIntegration;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
@@ -109,6 +110,8 @@ namespace HelloWorldSsms20Extension
             {
                 fileFullName = _dte.ActiveDocument.FullName;
             }
+
+            var a = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
 
             // Show a message box to prove we were here
             VsShellUtilities.ShowMessageBox(
