@@ -1,5 +1,7 @@
 ﻿using EnvDTE;
 using EnvDTE80;
+using Microsoft.SqlServer.Management.UI.VSIntegration;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Runtime.InteropServices;
@@ -28,6 +30,11 @@ namespace HelloWorldSsms20Extension
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(HelloWorldSsms20ExtensionPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasMultipleProjects_string)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionHasSingleProject_string)]
+    //[ProvideAutoLoad("d114938f-591c-46cf-a785-500a82d97410")] //CommandGuids.ObjectExplorerToolWindowIDString
     public sealed class HelloWorldSsms20ExtensionPackage : AsyncPackage
     {
         /// <summary>

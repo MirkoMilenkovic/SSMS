@@ -1,4 +1,6 @@
-﻿using EnvDTE80;
+﻿using EnvDTE;
+using EnvDTE80;
+using Microsoft.SqlServer.Management.Smo.RegSvrEnum;
 using Microsoft.SqlServer.Management.UI.VSIntegration;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -33,6 +35,8 @@ namespace HelloWorldSsms20Extension
 
         private DTE2 _dte;
 
+        private bool _logicInitialized = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HelloWorldCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file)
@@ -51,6 +55,105 @@ namespace HelloWorldSsms20Extension
             var menuItem = new MenuCommand(this.Execute, menuCommandID);
             commandService.AddCommand(menuItem);
             _dte = dte;
+        }
+
+        private void InitializeLogic()
+        {
+            // Ensure UI thread.
+            // touching Commands requires the UI thread.
+            // this should also ensure thread safety
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+#warning Mirko multiple init allowed
+/*
+            if (_logicInitialized)
+            {
+                return;
+            };
+*/
+
+            // perform initialization
+
+            Command command = _dte.Commands.Item("Query.Execute");
+
+            CommandEvents queryExecuteEvent = _dte.Events.get_CommandEvents(
+                command.Guid, 
+                command.ID);
+            queryExecuteEvent.BeforeExecute += this.QueryExecute_BeforeExecute;
+
+            _logicInitialized = true;
+        }
+
+        private void QueryExecute_BeforeExecute(
+            string Guid, 
+            int ID, 
+            object CustomIn, 
+            object CustomOut, 
+            ref bool CancelDefault)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            try
+            {
+                VsShellUtilities.ShowMessageBox(
+                this.package,
+                "works",
+                "handler",
+                OLEMSGICON.OLEMSGICON_INFO,
+                OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+
+                string queryText = GetQueryText();
+
+                if (string.IsNullOrWhiteSpace(queryText))
+                    return;
+
+                // Get Current Connection Information
+                UIConnectionInfo connInfo = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
+
+                return;
+
+                /*
+                var queryItem = new QueryItem()
+                {
+                    Query = queryText,
+                    Server = connInfo.ServerName,
+                    Username = connInfo.UserName,
+                    Database = connInfo.AdvancedOptions["DATABASE"],
+                    ExecutionDateUtc = DateTime.UtcNow
+                };
+
+                _logger.LogInformation("Enqueued {@quetyItem}", queryItem.Query);
+
+                itemsQueue.Enqueue(queryItem);
+
+                Task.Delay(1000).ContinueWith((t) => this.SavePendingItems());
+                */
+            }
+            catch (Exception ex)
+            {
+                // _logger.LogError("Error on BeforeExecute tracking", ex);
+            }
+        }
+
+        private string GetQueryText()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            Document document = _dte.ActiveDocument;
+            if (document == null)
+                return null;
+
+            var textDocument = (TextDocument)document.Object("TextDocument");
+            string queryText = textDocument.Selection.Text;
+
+            if (string.IsNullOrEmpty(queryText))
+            {
+                EditPoint startPoint = textDocument.StartPoint.CreateEditPoint();
+                queryText = startPoint.GetText(textDocument.EndPoint);
+            }
+
+            return queryText;
         }
 
         /// <summary>
@@ -87,9 +190,11 @@ namespace HelloWorldSsms20Extension
 
             OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             Instance = new HelloWorldCommand(
-                package, 
+                package,
                 commandService,
                 dte);
+
+            Instance.InitializeLogic();
         }
 
         /// <summary>
@@ -102,6 +207,9 @@ namespace HelloWorldSsms20Extension
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+
+            InitializeLogic();
+
             string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
             string title = "HelloWorldCommand";
 
@@ -111,7 +219,7 @@ namespace HelloWorldSsms20Extension
                 fileFullName = _dte.ActiveDocument.FullName;
             }
 
-            var a = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
+            Microsoft.SqlServer.Management.Smo.RegSvrEnum.UIConnectionInfo connInfo = ServiceCache.ScriptFactory.CurrentlyActiveWndConnectionInfo.UIConnectionInfo;
 
             // Show a message box to prove we were here
             VsShellUtilities.ShowMessageBox(
